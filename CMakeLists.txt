@@ -27,11 +27,11 @@ if (OPENMP_FOUND)
 endif()
 
 file ( GLOB ST_SOURCE
-  *.cpp
+  src/*.cpp
 )
 
 file ( GLOB ST_HEADER
-  *.h
+  src/*.h
 )
 
 set(ST_DEPS_LIBRARIES
@@ -40,7 +40,7 @@ set(ST_DEPS_LIBRARIES
   #${Boost_LIBRARIES}
 )
 
-add_library ( ST_static STATIC
+add_library ( st_static STATIC
         ${ST_HEADER}
         ${ST_SOURCE}
         )
@@ -48,7 +48,7 @@ add_library ( ST_static STATIC
 
 # Main exec
 add_executable( st_exe
-        main.cxx
+      src/main.cxx
 )
 
 set_target_properties ( st_exe
