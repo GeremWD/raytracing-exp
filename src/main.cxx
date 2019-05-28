@@ -32,6 +32,4 @@ int main(int argc, char *argv[]){
   for (int i=0; i<w*h; i++)
     fprintf(f,"%d %d %d ", toInt(image[i].x), toInt(image[i].y), toInt(image[i].z));
   printf("\n");
-
-  //write_exr_rgb<double>("test.exr", (const double*)c, w, h);
 }

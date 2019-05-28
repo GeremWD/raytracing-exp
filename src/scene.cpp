@@ -24,13 +24,17 @@ Scene::Scene() : points(512*512), points2d(512*512), analysis_image(512*512, Vec
     //primitives.push_back(new Sphere(16.5, Vec(27,16.5,47),       Vec(6, 6, 6),Vec(), DIFF));//Mirr
 
     Disk *_light = new Disk(10., Vec(50, 80, 100), Vec(0, -1, 0), Vec(10000, 10000, 10000), Vec(), DIFF);
-    sampler = new UniformDiskSampler(*_light);
+    mapping = new PolarDiskMapping(*_light);
+    projection_mapping = new DiskProjection(*_light);
 
-    /*Quad *_light = new Quad(Vec(50, 80, 100), Vec(20, 0, 0), Vec(0, 0, 20), Vec(10000, 10000, 10000), Vec(), DIFF);
-    sampler = new UniformQuadSampler(*_light);*/
+
+    /*Quad *_light = new Quad(Vec(50, 80, 100), Vec(0, 0, -20), Vec(20, 0, 0), Vec(10000, 10000, 10000), Vec(), DIFF);
+    mapping = new QuadMapping(*_light);*/
     
     light = _light;
     primitives.push_back(light);
+
+    sampler = new UniformSampler();
 }
 
 bool Scene::intersect(const Ray &r, double &t, Primitive **primitive) {
@@ -38,36 +42,6 @@ bool Scene::intersect(const Ray &r, double &t, Primitive **primitive) {
     for(int i=primitives.size();i--;) if((d=primitives[i]->intersect(r))&&d<t){t=d;*primitive = primitives[i];}
     return t<inf;
 }
-
-/*
-void writeEPS(const std::string& _filename, const std::vector<Point2d>& pts, int n, double radius, double scale){
-    std::string filename = _filename;
-    if(filename.compare(filename.size()-4, 4,".eps") != 0){
-        filename.erase(filename.end()-4, filename.end());
-        filename += ".eps";
-    }
-
-    std::ofstream os;
-    os.open(filename.c_str(), std::ofstream::out | std::ofstream::trunc);
-
-    radius /= scale;
-
-    os << "%!PS-Adobe-3.1 EPSF-3.0\n";
-    os << "%%HiResBoundingBox: " << -radius << " " << -radius << " " << scale+radius << " " << scale+radius << "\n";
-    os << "%%BoundingBox: " << -radius << " " << -radius << " " << scale+radius << " " << scale+radius << "\n";
-    os << "%%CropBox: " << -radius << " " << -radius << " " << scale+radius << " " << scale+radius << "\n";
-    os << "/radius { " << radius << " } def\n";
-    os << "/p { radius 0 360 arc closepath fill stroke } def\n";
-    os << "gsave " << scale << " " << scale << " scale\n";
-
-    os << "0 0 0 setrgbcolor\n";
-
-    for (int i = 0; i < n; ++i) {
-        os << pts[i].x << " " << pts[i].y << " p\n";
-    }
-    os << "grestore\n";
-    os.close();
-}*/
 
 Vec Scene::radiance(const Ray &r_, unsigned short *Xi, int n_samples, bool analysis) {
     double t;                               // distance to intersection
@@ -80,11 +54,11 @@ Vec Scene::radiance(const Ray &r_, unsigned short *Xi, int n_samples, bool analy
     
     Vec x=r.o+r.d*t, n=obj->normal(x), nl=n.dot(r.d)<0?n:n*-1;
 
-    sampler->sample(points, points2d, n_samples, Xi);
-    
+    sampler->sample(points2d, n_samples);
+
     Vec e;
     for(int i = 0; i<n_samples; i++) {
-        Vec &point = points[i];
+        Vec point = mapping->map(points2d[i]);
         Vec l = (point - x);
         double d = l.dot(l);
         l.norm();
@@ -97,8 +71,10 @@ Vec Scene::radiance(const Ray &r_, unsigned short *Xi, int n_samples, bool analy
             result = result.positive();
 
             if(analysis) {
-                int x = clampint((int)((points2d[i].x+10) * 512 / 20), 0, 511);
-                int y = clampint((int)((points2d[i].y+10) * 512 / 20), 0, 511);
+                Vec analysis_point = projection_mapping != nullptr ? projection_mapping->map(point) : points2d[i];
+
+                int x = clampint((int)((analysis_point.x) * 512), 0, 511);
+                int y = clampint((int)((analysis_point.y) * 512), 0, 511);
                 int pos = y*512+x;
                 analysis_image[pos] = analysis_image[pos] + result;
                 n_touched[pos]++;
@@ -108,8 +84,6 @@ Vec Scene::radiance(const Ray &r_, unsigned short *Xi, int n_samples, bool analy
     }
 
     if(analysis) {
-        //writeEPS("analysis.eps", points2d, n_samples, 10., 1.);
-
         for(int i = 0; i<512*512; i++) {
             if(n_touched[i] > 0) 
                 analysis_image[i] = analysis_image[i] * (1. / n_touched[i]);
@@ -120,8 +94,7 @@ Vec Scene::radiance(const Ray &r_, unsigned short *Xi, int n_samples, bool analy
         fprintf(f, "P3\n%d %d\n%d\n", 512, 512, 255);
         for (int i=0; i<512*512; i++)
             fprintf(f,"%d %d %d ", toInt(analysis_image[i].x), toInt(analysis_image[i].y), toInt(analysis_image[i].z));
-        write_exr_rgb<double>("analysis.exr", (const double*)analysis_image.data(), 512, 512);
-        
+        write_exr_rgb<double>("analysis.exr", (const double*)analysis_image.data(), 512, 512);        
     }
 
     e = e * (1. / n_samples);
