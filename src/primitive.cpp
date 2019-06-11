@@ -3,6 +3,7 @@
 #include <iostream>
 
 Primitive::Primitive(Refl_t refl_, Vec p_, Vec e_, Vec c_) : refl(refl_), p(p_), e(e_), c(c_) {}
+Primitive::~Primitive() {}
 
 bool Primitive::isLight() {
     return !(e.x<=0 && e.y<=0 && e.z<=0);
@@ -45,7 +46,7 @@ Disk::Disk(double radius_, Vec p_, Vec n_,Vec e_, Vec c_, Refl_t refl_) :
 
 double Disk::intersect(const Ray &r) const {
     double t = 0;
-    if (intersectPlane(n, p, r.o, r.d, t)) {
+    if (intersectPlane(n, p, r.o, r.d, t) || intersectPlane(n*-1, p, r.o, r.d, t)) {
         Vec pp = r.o + r.d * t;
         Vec v = pp - p;
         float d2 = v.dot(v);
@@ -64,7 +65,7 @@ Quad::Quad(Vec p_, Vec u_, Vec v_, Vec e_, Vec c_, Refl_t refl_) :
 
 double Quad::intersect(const Ray &r) const {
     double t = 0;
-    if (intersectPlane(normal(p), p, r.o, r.d, t)) {
+    if (intersectPlane(normal(p), p, r.o, r.d, t) || intersectPlane(normal(p)*-1, p, r.o, r.d, t)) {
         Vec pp = r.o + r.d * t;
         Vec pos = pp - p;
         Vec norm_u = u, norm_v = v;

@@ -24,8 +24,9 @@ private:
     std::vector<int> n_touched;
 
 public:
-    Scene();
+    Scene(Primitive *_light, Sampler *_sampler, Mapping *_mapping);
+    ~Scene();
 
     bool intersect(const Ray &r, double &t, Primitive **primitive);
-    Vec radiance(const Ray &r_, unsigned short *Xi, int n_samples, bool analysis=false);
+    Vec radiance(const Ray &r_, int n_samples, bool analysis=false);
 };

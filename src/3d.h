@@ -3,15 +3,25 @@
 
 #include <cmath>
 #include <algorithm>
+#include <vector>
+#include <string>
 
 //#define double float
+
+const double epsilon = 0.000001;
 
 inline double clamp(double x){ return x<0 ? 0 : x>1 ? 1 : x; }
 inline int clampint(int x, int min, int max) { return x < min ? min : x > max ? max : x; }
 inline int toInt(double x){ return int(pow(clamp(x),1/2.2)*255+.5); }
 
 struct Vec {        // Usage: time ./smallpt 5000 && xv image.ppm
-  double x, y, z;                  // position, also color (r,g,b)
+  union {
+    struct{
+      double x, y, z;      
+    };
+    double v[3];
+  };
+              // position, also color (r,g,b)
   Vec(double x_=0, double y_=0, double z_=0){ x=x_; y=y_; z=z_; }
   Vec operator+(const Vec &b) const { return Vec(x+b.x,y+b.y,z+b.z); }
   Vec operator-(const Vec &b) const { return Vec(x-b.x,y-b.y,z-b.z); }
@@ -29,3 +39,4 @@ struct Ray { Vec o, d; Ray(Vec o_, Vec d_) : o(o_), d(d_) {} };
 
 bool intersectPlane(const Vec &n, const Vec &p0, const Vec &l0, const Vec &l, double &t);
 
+void write_ppm(std::vector<Vec> &image, const std::string &filename, int w, int h);

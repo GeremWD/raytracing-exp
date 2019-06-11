@@ -7,7 +7,9 @@
 
 class Mapping {
 public:
+    virtual ~Mapping();
     virtual Vec map(Vec &a)=0;
+    virtual std::string name();
 };
 
 class Disk;
@@ -19,6 +21,15 @@ private:
     
 public:
     PolarDiskMapping(Disk &_disk);
+    Vec map(Vec &a) override;
+};
+
+class ConcentricDiskMapping : public Mapping {
+private:
+    Disk &disk;
+    Vec sw, su, sv;
+public:
+    ConcentricDiskMapping(Disk &_disk);
     Vec map(Vec &a) override;
 };
 
@@ -50,4 +61,3 @@ public:
     QuadMapping(Quad &_quad);
     Vec map(Vec &a) override;
 };
-

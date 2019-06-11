@@ -15,6 +15,7 @@ include_directories(
   #${TBB_INCLUDE_DIR}
   # Boost C++ libraries
   #${Boost_INCLUDE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 add_definitions(-O2 -Wno-deprecated)
@@ -48,15 +49,34 @@ add_library ( st_static STATIC
 
 # Main exec
 add_executable( st_exe
-      src/main.cxx
+      src/exe/main.cpp
 )
-
 set_target_properties ( st_exe
         PROPERTIES
         OUTPUT_NAME st
         )
-
 target_link_libraries( st_exe st_static ${ST_DEPS_LIBRARIES})
 
+
+# Variance exec
+add_executable( variance_exe
+        src/exe/variance.cpp
+)
+set_target_properties ( variance_exe
+        PROPERTIES
+        OUTPUT_NAME variance
+        )
+target_link_libraries( variance_exe st_static ${ST_DEPS_LIBRARIES})
+
+
+# Flat experiment exec
+add_executable( flat_experiment_exe
+        src/exe/flat_experiment.cpp
+)
+set_target_properties ( flat_experiment_exe
+        PROPERTIES
+        OUTPUT_NAME flat_experiment
+        )
+target_link_libraries( flat_experiment_exe st_static ${ST_DEPS_LIBRARIES})
 
 # vim: set et ts=2 sw=2 ft=cmake nospell:

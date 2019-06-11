@@ -13,6 +13,7 @@ struct Primitive {
     Refl_t refl;// reflection type (DIFFuse, SPECular, REFRactive)
     Vec p, e, c; //position, emission, color
     Primitive(Refl_t refl_, Vec p_, Vec e_, Vec c_);
+    virtual ~Primitive();
 
     virtual double intersect(const Ray &r) const = 0;
     virtual Vec normal(const Vec &intersection) const = 0;

@@ -1,6 +1,11 @@
 
 #include "mapping.h"
 
+Mapping::~Mapping() {}
+
+std::string Mapping::name() { return "";}
+
+
 PolarDiskMapping::PolarDiskMapping(Disk &_disk)
  : disk(_disk), sw(disk.n), su(((fabs(sw.x)>.1?Vec(0,1):Vec(1))%sw).norm()), sv(sw%su) {} 
 
@@ -9,6 +14,30 @@ Vec PolarDiskMapping::map(Vec &a) {
     double y2 = disk.radius * sqrt(a.x) * sin(2*M_PI*a.y);
     return disk.p + su * y1 + sv * y2;
 }
+
+
+ConcentricDiskMapping::ConcentricDiskMapping(Disk &_disk)
+ : disk(_disk), sw(disk.n), su(((fabs(sw.x)>.1?Vec(0,1):Vec(1))%sw).norm()), sv(sw%su) {}
+
+Vec ConcentricDiskMapping::map(Vec &a) {
+    double phi = 0, radius = disk.radius;
+
+    double aa = 2*a.x - 1, bb = 2*a.y - 1;
+    
+    if (aa == 0 || bb == 0) {
+        return Vec(0, 0, 0);
+    }
+    
+    if(aa > bb) {
+        radius *= aa;
+        phi = (M_PI / 4) * (bb/aa); 
+    } else {
+        radius *= bb;
+        phi = (M_PI / 2) - ((M_PI/4) * (aa/bb));
+    }
+    return disk.p + su * cos(phi) * radius + sv * sin(phi) * radius;
+}
+
 
 /*
 Polar4DiskMapping::Polar4DiskMapping(Disk &_disk) {
