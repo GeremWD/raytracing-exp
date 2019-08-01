@@ -1,3 +1,6 @@
 [submodule "ext/openexr"]
 	path = ext/openexr
 	url = https://github.com/wjakob/openexr.git
+[submodule "ext/libboard"]
+	path = ext/libboard
+	url = https://github.com/c-koi/libboard.git

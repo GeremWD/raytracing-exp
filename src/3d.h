@@ -40,3 +40,11 @@ struct Ray { Vec o, d; Ray(Vec o_, Vec d_) : o(o_), d(d_) {} };
 bool intersectPlane(const Vec &n, const Vec &p0, const Vec &l0, const Vec &l, double &t);
 
 void write_ppm(std::vector<Vec> &image, const std::string &filename, int w, int h);
+
+struct Disk2d {
+    double x, y, r;
+};
+
+struct Sphere3d {
+    double x, y, z, r;
+};

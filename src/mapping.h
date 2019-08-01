@@ -52,6 +52,15 @@ public:
     Vec map(Vec &a) override;
 };
 
+class PolarProjection : public Mapping {
+private:
+    DiskProjection disk_projection;
+
+public:
+    PolarProjection(Disk &_disk);
+    Vec map(Vec &a) override;
+};
+
 class Quad;
 
 class QuadMapping : public Mapping {

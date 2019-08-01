@@ -87,6 +87,30 @@ public:
 };
 
 
+class JitteredSampler : public Sampler
+{
+private:
+    std::mt19937 gen;
+    std::uniform_real_distribution<double> dis;
+
+public:
+    JitteredSampler();
+    void sample(std::vector<Vec> &points, int n) override;
+    std::string name() override;
+};
+
+
+class UniformJitteredSampler : public Sampler {
+private:
+    std::mt19937 gen;
+    std::uniform_real_distribution<double> dis;
+public:
+    UniformJitteredSampler();
+    void sample(std::vector<Vec> &points, int n) override;
+    std::string name() override;    
+};
+
+
 class MultiJitteredSampler : public Sampler
 {
 private:
@@ -111,3 +135,17 @@ public:
     void sample(std::vector<Vec> &points, int n) override;
     std::string name() override;
 };    
+
+
+class PoissonDiskSampler : public Sampler
+{
+private:
+    std::mt19937 gen;
+    std::uniform_real_distribution<double> dis;
+    double radius;
+
+public:
+    PoissonDiskSampler(double _radius);
+    void sample(std::vector<Vec> &points, int n) override;
+    std::string name() override;
+};

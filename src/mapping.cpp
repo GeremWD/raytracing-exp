@@ -19,23 +19,33 @@ Vec PolarDiskMapping::map(Vec &a) {
 ConcentricDiskMapping::ConcentricDiskMapping(Disk &_disk)
  : disk(_disk), sw(disk.n), su(((fabs(sw.x)>.1?Vec(0,1):Vec(1))%sw).norm()), sv(sw%su) {}
 
-Vec ConcentricDiskMapping::map(Vec &a) {
-    double phi = 0, radius = disk.radius;
 
-    double aa = 2*a.x - 1, bb = 2*a.y - 1;
-    
-    if (aa == 0 || bb == 0) {
-        return Vec(0, 0, 0);
-    }
-    
-    if(aa > bb) {
-        radius *= aa;
-        phi = (M_PI / 4) * (bb/aa); 
+Vec ConcentricDiskMapping::map(Vec &onSquare) {
+    double phi, r, u, v;
+    double a = 2*onSquare.x-1;
+    double b = 2*onSquare.y-1;
+    if(a > -b) {
+        if(a > b) {
+            r = a;
+            phi = (M_PI/4) * (b/a);
+        } else {
+            r = b;
+            phi = (M_PI/4) * (2 - (a/b));
+        }
     } else {
-        radius *= bb;
-        phi = (M_PI / 2) - ((M_PI/4) * (aa/bb));
+        if(a < b) {
+            r = -a;
+            phi = (M_PI/4) * (4+(b/a));
+        } else {
+            r = -b;
+            if(b != 0) {
+                phi = (M_PI/4) * (6 - (a/b));
+            } else {
+                phi = 0;
+            }
+        }
     }
-    return disk.p + su * cos(phi) * radius + sv * sin(phi) * radius;
+    return disk.p + su * r * cos(phi) * disk.radius + sv * r * sin(phi) * disk.radius;
 }
 
 
@@ -50,6 +60,19 @@ DiskProjection::DiskProjection(Disk &_disk)
 
 Vec DiskProjection::map(Vec &a) {
     return Vec((a - disk.p).dot(su), (a - disk.p).dot(sv), 0) * (1. / (2*disk.radius)) + Vec(0.5, 0.5, 0);
+}
+
+
+PolarProjection::PolarProjection(Disk &_disk)
+    : disk_projection(_disk) {}
+
+Vec PolarProjection::map(Vec &a) {
+    //Vec v = disk_projection.map(a);
+    //v.x = sqrt(v.x);
+    //v.y = 2*M_PI*v.y;
+    Vec v = a;
+    v.x = sqrt(v.x);
+    return v;
 }
 
 

@@ -14,6 +14,7 @@ void UniformSampler::sample(std::vector<Vec> &points, int n) {
     for(int i = 0; i<n; i++) {
         points[i].x = dis(gen);
         points[i].y = dis(gen);
+        points[i].z = 0;
     }
 }
 
@@ -96,6 +97,38 @@ Vec ArtSampler::getSample(unsigned tileID, unsigned sampleNo) const {
 std::string ArtSampler::name() { return "art";}
 
 
+JitteredSampler::JitteredSampler() : gen(0), dis(0., 1.) {}
+
+void JitteredSampler::sample(std::vector<Vec> &points, int n) {
+    int m = round(sqrt((double)n));
+    for(int j = 0; j<m; j++) {
+        for(int i = 0; i<m; i++) {
+            points[j*m+i].x = (double)i / m + dis(gen) / m; 
+            points[j*m+i].y = (double)j / m + dis(gen) / m;
+        }
+    }
+}
+
+std::string JitteredSampler::name() { return "jittered"; }
+
+
+UniformJitteredSampler::UniformJitteredSampler() : gen(0), dis(0., 1.) {}
+
+void UniformJitteredSampler::sample(std::vector<Vec> &points, int n) {
+    int m = round(sqrt((double)n));
+    double offset_x = dis(gen);
+    double offset_y = dis(gen);
+    for(int j = 0; j<m; j++) {
+        for(int i = 0; i<m; i++) {
+            points[j*m+i].x = (double)i / m + offset_x / m; 
+            points[j*m+i].y = (double)j / m + offset_y / m;
+        }
+    }
+}
+
+std::string UniformJitteredSampler::name() { return "uniform_jittered";}
+
+
 MultiJitteredSampler::MultiJitteredSampler() : gen(0), dis(0., 1.) {}
 
 void MultiJitteredSampler::sample(std::vector<Vec> &points, int n) {
@@ -103,7 +136,7 @@ void MultiJitteredSampler::sample(std::vector<Vec> &points, int n) {
     for(int j = 0; j < m; j++) {
         for(int i = 0; i < m; i++) {
             points[j*m+i].x = (i+(j+dis(gen)) / m) / m;
-            points[j*m+i].y = (i+(j+dis(gen)) / m) / m;
+            points[j*m+i].y = (j+(i+dis(gen)) / m) / m;
             points[j*m+i].z = 0;
         }
     }
@@ -131,7 +164,7 @@ void CorrelatedMultiJitteredSampler::sample(std::vector<Vec> &points, int n) {
     for(int j = 0; j < m; j++) {
         for(int i = 0; i < m; i++) {
             points[j*m+i].x = (i+(j+dis(gen)) / m) / m;
-            points[j*m+i].y = (i+(j+dis(gen)) / m) / m;
+            points[j*m+i].y = (j+(i+dis(gen)) / m) / m;
             points[j*m+i].z = 0;
         }
     }
@@ -150,3 +183,27 @@ void CorrelatedMultiJitteredSampler::sample(std::vector<Vec> &points, int n) {
 }
 
 std::string CorrelatedMultiJitteredSampler::name() { return "correlated_multi_jittered";}
+
+
+PoissonDiskSampler::PoissonDiskSampler(double _radius) : gen(0), dis(0., 1.), radius(_radius) {}
+
+std::string PoissonDiskSampler::name() { return "poisson_disk";}
+
+bool inDisk(std::vector<Vec> &points, int n, Vec &p, double r) {
+    for(int i  = 0; i<n; i++) {
+        if((points[i] - p).length() < r) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void PoissonDiskSampler::sample(std::vector<Vec> &points, int n) {
+    for(int i = 0; i<n; i++) {
+        do {
+            points[i].x = dis(gen);
+            points[i].y = dis(gen);
+            points[i].z = 0;
+        } while(inDisk(points, i, points[i], radius));
+    }
+}
