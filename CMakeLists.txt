@@ -16,6 +16,8 @@ include_directories(
   # Boost C++ libraries
   #${Boost_INCLUDE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/src
+  #${CMAKE_CURRENT_SOURCE_DIR}/ext/libboard/include
+
 )
 
 add_definitions(-O2 -Wno-deprecated)
@@ -78,5 +80,83 @@ set_target_properties ( flat_experiment_exe
         OUTPUT_NAME flat_experiment
         )
 target_link_libraries( flat_experiment_exe st_static ${ST_DEPS_LIBRARIES})
+
+
+# Visuals experiment exec
+add_executable( visuals_exe
+        src/exe/visuals.cpp
+)
+set_target_properties ( visuals_exe
+        PROPERTIES
+        OUTPUT_NAME visuals
+        )
+target_link_libraries( visuals_exe st_static ${ST_DEPS_LIBRARIES})
+
+
+# pixels mse experiment exec
+add_executable( mse_pixels_exe
+        src/exe/mse_pixels.cpp
+)
+set_target_properties ( mse_pixels_exe
+        PROPERTIES
+        OUTPUT_NAME mse_pixels
+        )
+target_link_libraries( mse_pixels_exe st_static ${ST_DEPS_LIBRARIES})
+
+
+# test libboard exec
+#add_executable( test_libboard_exe
+#       src/exe/test_libboard.cpp
+#)
+#set_target_properties ( test_libboard_exe
+#        PROPERTIES
+#        OUTPUT_NAME test_libboard
+#        )
+#target_link_libraries( test_libboard_exe st_static ${ST_DEPS_LIBRARIES} ${CMAKE_CURRENT_SOURCE_DIR}/ext/libboard/lib/libboard.a)
+
+
+# pcf experiment exec
+add_executable( pcf_experiment_exe
+        src/exe/pcf_experiment.cpp
+)       
+set_target_properties ( pcf_experiment_exe
+        PROPERTIES
+        OUTPUT_NAME pcf_experiment
+        )
+target_link_libraries( pcf_experiment_exe st_static ${ST_DEPS_LIBRARIES})
+
+
+# pcf slope experiment exec
+add_executable( pcf_slope_experiment_exe
+        src/exe/pcf_slope_experiment.cpp
+)       
+set_target_properties ( pcf_slope_experiment_exe
+        PROPERTIES
+        OUTPUT_NAME pcf_slope_experiment
+        )
+target_link_libraries( pcf_slope_experiment_exe st_static ${ST_DEPS_LIBRARIES})
+
+
+# pcf slope experiment exec
+add_executable( multiclass_exe
+        src/exe/multiclass.cpp
+)       
+set_target_properties ( multiclass_exe
+        PROPERTIES
+        OUTPUT_NAME multiclass
+        )
+target_link_libraries( multiclass_exe st_static ${ST_DEPS_LIBRARIES})
+
+# pcf disk experiment exec
+add_executable( pcf_disk_exe
+        src/exe/pcf_disk.cpp
+)       
+set_target_properties ( pcf_disk_exe
+        PROPERTIES
+        OUTPUT_NAME pcf_disk
+        )
+target_link_libraries( pcf_disk_exe st_static ${ST_DEPS_LIBRARIES})
+
+
 
 # vim: set et ts=2 sw=2 ft=cmake nospell:
