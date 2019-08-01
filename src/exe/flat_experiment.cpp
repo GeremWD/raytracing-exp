@@ -10,7 +10,7 @@ double f(double x, double y) {
 
 int main() {
     int w = 512, n_points = 16, point_width=3;
-    Sampler *sampler = new RegularSampler();
+    Sampler *sampler = new CorrelatedMultiJitteredSampler();
 
     std::mt19937 gen;
     std::uniform_real_distribution<double> dis(0., 1.);
@@ -20,10 +20,10 @@ int main() {
     sampler->sample(points, n_points);
 
     Disk disk(0.5, Vec(0.5, 0.5, 0), Vec(0, 0, 1), Vec(), Vec(), DIFF);
-    //Mapping *mapping = new PolarDiskMapping(disk);
-    Mapping *mapping = new ConcentricDiskMapping(disk);
+    Mapping *mapping = new PolarDiskMapping(disk);
+    //Mapping *mapping = new ConcentricDiskMapping(disk);
 
-    for(int x = 0; x<w; x++) {
+    /*for(int x = 0; x<w; x++) {
         for(int y = 0; y<w; y++) {
             double xx = ( .5 + x)/w;
             double yy = ( .5 + y)/w;
@@ -31,7 +31,7 @@ int main() {
             left_image[y*w+x] = Vec(val, val, val);
             right_image[y*w+x] = Vec(val, val, val);
         }
-    }
+    }*/
 
     for(auto point : points) {
         int x = clampint((int)(point.x * w), 0, w-1);
